@@ -14,7 +14,7 @@ def video_generator():
                                             )
 
     print(" generator and detector loaded ...  ")
-    source_image = 'me.jpg'
+    source_image = 'me.png'
     driving_video = '04.mp4'
     source_image = imageio.imread(source_image)
     reader = imageio.get_reader(driving_video)
@@ -33,6 +33,7 @@ def video_generator():
     predictions = make_animation(   source_image, driving_video, generator, kp_detector, 
                                     relative=True, adapt_movement_scale=True)
     #save resulting video
+    print( 'generating animated video ')
     imageio.mimsave('generated.mp4', [img_as_ubyte(frame) for frame in predictions], fps=fps)
     print( 'video saved ...')
 
