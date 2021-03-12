@@ -28,18 +28,19 @@ def load_checkpoints(config_path, checkpoint_path, cpu=False):
 
     generator = OcclusionAwareGenerator(**config['model_params']['generator_params'],
                                         **config['model_params']['common_params'])
-    if not cpu:
-        generator.cuda()
+
+
+
+    
+    checkpoint = torch.load(checkpoint_path, map_location='cpu',)
+    generator.to('cpu')
 
     kp_detector = KPDetector(**config['model_params']['kp_detector_params'],
                              **config['model_params']['common_params'])
-    if not cpu:
-        kp_detector.cuda()
+
+    kp_detector.to('cpu')
     
-    if cpu:
-        checkpoint = torch.load(checkpoint_path, map_location=torch.device('cpu'))
-    else:
-        checkpoint = torch.load(checkpoint_path)
+    
  
     generator.load_state_dict(checkpoint['generator'])
     kp_detector.load_state_dict(checkpoint['kp_detector'])
@@ -58,16 +59,14 @@ def make_animation(source_image, driving_video, generator, kp_detector, relative
     with torch.no_grad():
         predictions = []
         source = torch.tensor(source_image[np.newaxis].astype(np.float32)).permute(0, 3, 1, 2)
-        if not cpu:
-            source = source.cuda()
+        source = source.to('cpu')
         driving = torch.tensor(np.array(driving_video)[np.newaxis].astype(np.float32)).permute(0, 4, 1, 2, 3)
         kp_source = kp_detector(source)
         kp_driving_initial = kp_detector(driving[:, :, 0])
 
         for frame_idx in tqdm(range(driving.shape[2])):
             driving_frame = driving[:, :, frame_idx]
-            if not cpu:
-                driving_frame = driving_frame.cuda()
+            driving_frame = driving_frame.to('cpu')
             kp_driving = kp_detector(driving_frame)
             kp_norm = normalize_kp(kp_source=kp_source, kp_driving=kp_driving,
                                    kp_driving_initial=kp_driving_initial, use_relative_movement=relative,
