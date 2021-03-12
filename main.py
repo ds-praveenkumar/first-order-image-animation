@@ -32,7 +32,6 @@ def video_generator():
     driving_video = [resize(frame, (256, 256))[..., :3] for frame in driving_video]
     predictions = make_animation(   source_image, driving_video, generator, kp_detector, 
                                     relative=True, adapt_movement_scale=True)
-
     #save resulting video
     imageio.mimsave('generated.mp4', [img_as_ubyte(frame) for frame in predictions], fps=fps)
     print( 'video saved ...')
